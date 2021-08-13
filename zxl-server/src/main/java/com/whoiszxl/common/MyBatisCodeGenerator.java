@@ -29,7 +29,7 @@ public class MyBatisCodeGenerator {
 
     //代码生成步骤三： 配置需要生成代码的表名
     public static final String[] tableNames = new String[]{
-            "zxl_config", "zxl_server"
+            "zxl_software", "zxl_software_config", "zxl_admin", "zxl_admin_log"
     };
 
     //代码生成步骤四：直接运行就能生成了

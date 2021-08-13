@@ -1,16 +1,19 @@
 package com.whoiszxl.controller;
 
 
-import com.jcraft.jsch.Session;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whoiszxl.entity.Server;
 import com.whoiszxl.entity.common.ResponseResult;
+import com.whoiszxl.entity.common.ServerQuery;
 import com.whoiszxl.service.ServerService;
-import com.whoiszxl.utils.CommandUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -20,36 +23,59 @@ import org.springframework.web.bind.annotation.RestController;
  * @author whoiszxl
  * @since 2021-08-12
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/server")
+@Api(tags = "服务器相关接口")
 public class ServerController {
 
     @Autowired
     private ServerService serverService;
 
-    @PostMapping("/install/jdk/{serverId}")
-    public ResponseResult<Object> installJDK(@PathVariable Integer serverId) {
-        Server server = serverService.getById(serverId);
-        Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
-        CommandUtil.exec(session, "tar -zxvf /opt/software/jdk-8u212-linux-x64.tar.gz -C /opt/module");
-        CommandUtil.exec(session, "mv /opt/module/jdk1.8.0_212 /opt/module/jdk");
-        CommandUtil.exec(session, "echo -e '#JAVA_HOME\nexport JAVA_HOME=/opt/module/jdk\nexport PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile.d/zxl_hadoop_env.sh");
-        CommandUtil.exec(session, "source /etc/profile.d/zxl_hadoop_env.sh");
-        String jdkValidate = CommandUtil.exec(session, "java -version");
-        System.out.println(jdkValidate);
-        session.disconnect();
-        return ResponseResult.buildSuccess(jdkValidate);
+    @SaCheckLogin
+    @GetMapping
+    @ApiOperation(value = "分页获取配置列表", notes = "分页获取配置列表", response = Server.class)
+    public ResponseResult<IPage<Server>> list(ServerQuery serverQuery) {
+        LambdaQueryWrapper<Server> wrapper = new LambdaQueryWrapper<>();
+        if(StringUtils.isNotBlank(serverQuery.getServerName())) {
+            wrapper.like(Server::getServerName, "%" + serverQuery.getServerName() + "%");
+        }
+        wrapper.orderByDesc(Server::getServerName);
+        IPage<Server> pageResult = serverService.page(new Page<>(serverQuery.getPage(), serverQuery.getSize()), wrapper);
+        return ResponseResult.buildSuccess(pageResult);
     }
 
-    @PostMapping("/test/{serverId}")
-    public ResponseResult<Object> test(@PathVariable Integer serverId) {
-        Server server = serverService.getById(serverId);
-        Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
-        String jdkValidate = CommandUtil.exec(session, "jps");
-        System.out.println(jdkValidate);
-        return ResponseResult.buildSuccess(jdkValidate);
+    @SaCheckLogin
+    @GetMapping("/{id}")
+    @ApiOperation(value = "通过主键ID获取服务器信息", notes = "通过主键ID获取服务器信息", response = Server.class)
+    public ResponseResult<Server> get(@PathVariable Integer id) {
+        Server server = serverService.getById(id);
+        return ResponseResult.buildSuccess(server);
     }
 
+    @SaCheckLogin
+    @PostMapping
+    @ApiOperation(value = "新增服务器", notes = "新增服务器", response = ResponseResult.class)
+    public ResponseResult<Boolean> save(@RequestBody Server server) {
+        boolean saveFlag = serverService.save(server);
+        return ResponseResult.buildByFlag(saveFlag);
+    }
+
+    @SaCheckLogin
+    @PutMapping
+    @ApiOperation(value = "更新服务器", notes = "更新服务器", response = ResponseResult.class)
+    public ResponseResult<Boolean> update(@RequestBody Server server) {
+        boolean updateFlag = serverService.updateById(server);
+        return ResponseResult.buildByFlag(updateFlag);
+    }
+
+    @SaCheckLogin
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除服务器", notes = "删除服务器", response = ResponseResult.class)
+    public ResponseResult<Boolean> delete(@PathVariable Integer id) {
+        boolean removeFlag = serverService.removeById(id);
+        return ResponseResult.buildByFlag(removeFlag);
+    }
 
 }
 

@@ -26,7 +26,7 @@ public class Server implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "服务器主键ID")
-    @TableId(value = "id", type = IdType.ID_WORKER)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     @ApiModelProperty(value = "服务器host名称")
@@ -48,7 +48,7 @@ public class Server implements Serializable {
     private String serverPassword;
 
     @ApiModelProperty(value = "状态：0失效 1有效")
-    private Boolean status;
+    private Integer status;
 
     @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty(value = "创建时间")

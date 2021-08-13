@@ -26,7 +26,7 @@ public class Config implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "配置主键ID")
-    @TableId(value = "id", type = IdType.ID_WORKER)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     @ApiModelProperty(value = "配置键")
@@ -36,7 +36,7 @@ public class Config implements Serializable {
     private String value;
 
     @ApiModelProperty(value = "状态：0失效 1有效")
-    private Boolean status;
+    private Integer status;
 
     @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty(value = "创建时间")
