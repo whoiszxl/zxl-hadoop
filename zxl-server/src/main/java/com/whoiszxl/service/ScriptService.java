@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ScriptService extends IService<Script> {
 
+    /**
+     * 通过脚本名称获取脚本
+     * @param scriptName 脚本名称
+     * @return 脚本信息
+     */
+    Script getByScriptName(String scriptName);
 }

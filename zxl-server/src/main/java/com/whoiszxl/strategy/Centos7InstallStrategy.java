@@ -2,6 +2,7 @@ package com.whoiszxl.strategy;
 
 import com.jcraft.jsch.Session;
 import com.whoiszxl.constants.ConfigConstants;
+import com.whoiszxl.constants.ScriptConstants;
 import com.whoiszxl.entity.Script;
 import com.whoiszxl.entity.Server;
 import com.whoiszxl.service.ConfigService;
@@ -41,16 +42,20 @@ public class Centos7InstallStrategy implements InstallStrategy{
 
     @Override
     public boolean configSshNoPasswordLogin() {
+        //获取ssh脚本路径
+        Script script = scriptService.getByScriptName(ScriptConstants.SSH_NO_PASS_LOGIN);
+        String absolutePath = script.getScriptPath() + script.getScriptName();
+
         List<Server> serverList = serverService.list(null);
         for (Server server : serverList) {
             Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
-            String exec = CommandUtil.exec(session, "ssh-keygen -t rsa");
-            CommandUtil.exec(session, "<br>");
-            CommandUtil.exec(session, "<br>");
-            CommandUtil.exec(session, "<br>");
+            //执行脚本
+            CommandUtil.exec(session, buildSshNoPasswordLoginCommand(absolutePath, serverList) + " " + server.getServerPassword());
         }
         return true;
     }
+
+
 
     @Override
     public boolean syncScript() {
@@ -78,6 +83,24 @@ public class Centos7InstallStrategy implements InstallStrategy{
         }
         Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
         return CommandUtil.exec(session, "cat " + absolutePath);
+    }
+
+    /**
+     * <p>构建ssh免密登录执行的命令</p>
+     *
+     *  例：/opt/zxl-hadoop/script/ssh_no_pass_login.sh 'hadoop101 hadoop102 hadoop103'
+     * @param absolutePath 脚本的绝对路径
+     * @param serverList 所有服务器
+     * @return
+     */
+    private String buildSshNoPasswordLoginCommand(String absolutePath, List<Server> serverList) {
+        StringBuilder sb = new StringBuilder(absolutePath);
+        sb.append(" '");
+        for (Server server : serverList) {
+            sb.append(server.getServerName() + " ");
+        }
+        sb.append("'");
+        return sb.toString();
     }
 
     /**

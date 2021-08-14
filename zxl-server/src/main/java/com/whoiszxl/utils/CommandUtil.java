@@ -30,8 +30,8 @@ public class CommandUtil {
             if(session.isConnected()) {
                 return session;
             }
-            session.setTimeout(SSH_TIMEOUT);
-            session.connect();
+
+            session = JschUtil.openSession(sshHost, sshPort, sshUser, sshPass, SSH_TIMEOUT);
             return session;
         }catch (Exception e) {
             log.error("获取session连接失败", e);

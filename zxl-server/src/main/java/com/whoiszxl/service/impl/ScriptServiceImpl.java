@@ -1,5 +1,6 @@
 package com.whoiszxl.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whoiszxl.entity.Script;
 import com.whoiszxl.mapper.ScriptMapper;
 import com.whoiszxl.service.ScriptService;
@@ -17,4 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScriptServiceImpl extends ServiceImpl<ScriptMapper, Script> implements ScriptService {
 
+    @Override
+    public Script getByScriptName(String scriptName) {
+        LambdaQueryWrapper<Script> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Script::getScriptName, scriptName);
+        return this.getOne(queryWrapper);
+    }
 }
