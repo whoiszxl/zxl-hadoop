@@ -57,6 +57,22 @@ CREATE TABLE `zxl_software_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='基础组件配置表';
 
 
+DROP TABLE IF EXISTS `zxl_script`;
+CREATE TABLE `zxl_script` (
+    `id`                            int(10) NOT NULL AUTO_INCREMENT COMMENT '脚本文件主键ID',
+    `script_name`                   varchar(300) NOT NULL COMMENT '脚本名称',
+    `script_content`                text NOT NULL COMMENT '脚本内容',
+    `script_desc   `                varchar(300) NOT NULL COMMENT '脚本描述',
+    `config_path`                   varchar(300) NOT NULL COMMENT '配置文件路径',
+    `config_template`               text NOT NULL COMMENT '配置文件模板',
+    `config_template_params`        varchar(2000) NOT NULL COMMENT '配置文件模板参数，JSON格式保存，example: {"namenode_port":10000}',
+    `install_status`                tinyint(1) DEFAULT 1 COMMENT '安装状态：1 未安装 2 安装成功',
+    `created_at`                    datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at`                    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SH脚本表';
+
+
 DROP TABLE IF EXISTS `zxl_admin`;
 CREATE TABLE `zxl_admin`(
   `id`                                  int(10) NOT NULL AUTO_INCREMENT COMMENT '主键',

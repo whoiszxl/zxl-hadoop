@@ -49,9 +49,10 @@ public class InstallController {
     @ApiOperation(value = "测试", notes = "测试", response = Object.class)
     public ResponseResult<Object> test(@PathVariable Integer serverId) {
         Server server = serverService.getById(serverId);
-        Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
-        String jdkValidate = CommandUtil.exec(session, "jps");
-        System.out.println(jdkValidate);
-        return ResponseResult.buildSuccess(jdkValidate);
+        Session session1 = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+        Session session2 = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+        System.out.println(session1);
+        System.out.println(session2);
+        return ResponseResult.buildSuccess();
     }
 }

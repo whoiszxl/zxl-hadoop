@@ -19,14 +19,18 @@
         <el-table-column width="150" prop="serverInnerIp" label="内网地址"/>
         <el-table-column width="150" prop="serverPort" label="连接端口"/>
         <el-table-column width="150" prop="serverUsername" label="用户名"/>
-        <el-table-column width="200" prop="serverPassword" label="密码"/>
         <el-table-column width="200" prop="updatedAt" label="更新时间"/>
 
         <el-table-column label="操作">
           <template #default="scope">
             <span style="margin-left:2px;">
             <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
-            <el-button @click="handleDelete(scope.row.id)" type="primary" size="small" icon="el-icon-delete">删除</el-button>
+
+            <el-popconfirm title="确定删除吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleDelete(scope.row.id)">
+              <template #reference>
+                <el-button size="small" type="primary" icon="el-icon-delete">删除</el-button>
+              </template>
+            </el-popconfirm>
             </span>
           </template>
         </el-table-column>

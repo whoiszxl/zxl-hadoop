@@ -20,8 +20,30 @@
             </template>
             <el-menu-item-group>
               <el-menu-item index="/"><i class="el-icon-star-off" />首页</el-menu-item>
+              <el-menu-item index="/init"><i class="el-icon-star-off" />初始化</el-menu-item>
               <el-menu-item index="/server"><i class="el-icon-star-off" />服务器管理</el-menu-item>
               <el-menu-item index="/software"><i class="el-icon-star-off" />组件管理</el-menu-item>
+              <el-menu-item index="/script"><i class="el-icon-star-off" />脚本管理</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="2">
+            <template #title>
+              <span>系统监控管理</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/disk"><i class="el-icon-star-off" />磁盘监控</el-menu-item>
+              <el-menu-item index="/network"><i class="el-icon-star-off" />网络监控</el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-submenu index="3">
+            <template #title>
+              <span>管理员管理</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/admin"><i class="el-icon-star-off" />管理员列表</el-menu-item>
+              <el-menu-item index="/admin/add"><i class="el-icon-star-off" />管理员新增</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 
@@ -59,12 +81,12 @@ export default {
     const router = useRouter()
     const state = reactive({
       showMenu: true,
-      defaultOpen: ['1', '2'],
+      defaultOpen: ['1'],
       currentPath: '/',
     })
 
     router.beforeEach((to, from, next) => {
-      if (to.path == '/login') {
+      if (to.path === '/login') {
         // 如果路径是 /login 则正常执行
         next()
       } else {

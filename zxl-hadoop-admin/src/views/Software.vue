@@ -26,12 +26,18 @@
         </el-table-column>
 
 
-        <el-table-column width="300" label="操作">
+        <el-table-column width="500" label="操作">
           <template #default="scope">
             <span style="margin-left:2px;">
             <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
+            <el-button @click="handleConfig(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">配置文件管理</el-button>
             <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
-            <el-button @click="handleDelete(scope.row.id)" type="primary" size="small" icon="el-icon-delete">删除</el-button>
+
+            <el-popconfirm title="确定删除吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleDelete(scope.row.id)">
+              <template #reference>
+                <el-button size="small" type="primary" icon="el-icon-delete">删除</el-button>
+              </template>
+            </el-popconfirm>
             </span>
           </template>
         </el-table-column>
@@ -68,6 +74,10 @@ export default {
       router.push({ path: '/software/add', query: { id } })
     }
 
+    const handleConfig = (id) => {
+      router.push({ path: '/software/config', query: { id } })
+    }
+
     const handleDelete = (id) => {
 
       axios.delete(`/software/` + id, {
@@ -82,6 +92,7 @@ export default {
       search,
       handleAdd,
       handleEdit,
+      handleConfig,
       handleDelete,
       table
 

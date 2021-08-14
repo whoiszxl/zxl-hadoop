@@ -41,9 +41,9 @@ public class ConfigController {
     public ResponseResult<IPage<Config>> list(ConfigQuery configQuery) {
         LambdaQueryWrapper<Config> wrapper = new LambdaQueryWrapper<>();
         if(StringUtils.isNotBlank(configQuery.getKey())) {
-            wrapper.like(Config::getKey, "%" + configQuery.getKey() + "%");
+            wrapper.like(Config::getConfigKey, "%" + configQuery.getKey() + "%");
         }
-        wrapper.orderByDesc(Config::getKey);
+        wrapper.orderByDesc(Config::getConfigKey);
         IPage<Config> pageResult = configService.page(new Page<>(configQuery.getPage(), configQuery.getSize()), wrapper);
         return ResponseResult.buildSuccess(pageResult);
     }

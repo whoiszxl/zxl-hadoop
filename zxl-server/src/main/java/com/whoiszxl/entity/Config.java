@@ -30,10 +30,10 @@ public class Config implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "配置键")
-    private String key;
+    private String configKey;
 
     @ApiModelProperty(value = "配置值")
-    private String value;
+    private String configValue;
 
     @ApiModelProperty(value = "状态：0失效 1有效")
     private Integer status;
