@@ -21,7 +21,7 @@ export function setToken(key, token) {
 
 export const pathMap = {
     index: '首页',
-    init: '初始化',
+    init: '组件安装',
     login: '登录',
     software: '组件管理',
     softwareAdd: '组件新增',

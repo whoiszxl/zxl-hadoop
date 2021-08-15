@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SoftwareService extends IService<Software> {
 
+    /**
+     * 通过组件名称获取组件信息
+     * @param softwareName 组件名称
+     * @return 组件信息
+     */
+    Software getBySoftwareName(String softwareName);
 }

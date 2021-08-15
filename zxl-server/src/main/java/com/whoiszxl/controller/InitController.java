@@ -47,6 +47,14 @@ public class InitController {
         return ResponseResult.buildByFlag(configFlag);
     }
 
+    @SaCheckLogin
+    @PostMapping("/syncSoftware")
+    @ApiOperation(value = "同步组件安装包", notes = "同步组件安装包", response = Object.class)
+    public ResponseResult<Object> syncSoftware() {
+        boolean configFlag = installStrategy.syncSofware();
+        return ResponseResult.buildByFlag(configFlag);
+    }
+
 
     @SaCheckLogin
     @PostMapping("/configSshNoPasswordLogin")

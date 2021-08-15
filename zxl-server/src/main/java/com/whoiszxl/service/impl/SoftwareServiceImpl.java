@@ -1,5 +1,6 @@
 package com.whoiszxl.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whoiszxl.entity.Software;
 import com.whoiszxl.mapper.SoftwareMapper;
 import com.whoiszxl.service.SoftwareService;
@@ -17,4 +18,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class SoftwareServiceImpl extends ServiceImpl<SoftwareMapper, Software> implements SoftwareService {
 
+    @Override
+    public Software getBySoftwareName(String softwareName) {
+        LambdaQueryWrapper<Software> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Software::getSoftwareName, softwareName);
+        return this.getOne(queryWrapper);
+    }
 }

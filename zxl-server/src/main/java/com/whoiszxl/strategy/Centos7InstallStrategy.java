@@ -3,18 +3,24 @@ package com.whoiszxl.strategy;
 import com.jcraft.jsch.Session;
 import com.whoiszxl.constants.ConfigConstants;
 import com.whoiszxl.constants.ScriptConstants;
+import com.whoiszxl.constants.SoftwareConstants;
 import com.whoiszxl.entity.Script;
 import com.whoiszxl.entity.Server;
+import com.whoiszxl.entity.Software;
 import com.whoiszxl.service.ConfigService;
 import com.whoiszxl.service.ScriptService;
 import com.whoiszxl.service.ServerService;
+import com.whoiszxl.service.SoftwareService;
 import com.whoiszxl.utils.CommandUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
+@Slf4j
 public class Centos7InstallStrategy implements InstallStrategy{
 
     @Autowired
@@ -25,6 +31,9 @@ public class Centos7InstallStrategy implements InstallStrategy{
 
     @Autowired
     private ScriptService scriptService;
+
+    @Autowired
+    private SoftwareService softwareService;
 
     @Override
     public boolean configHosts() {
@@ -75,6 +84,33 @@ public class Centos7InstallStrategy implements InstallStrategy{
         return true;
     }
 
+
+    @Override
+    public boolean syncSofware() {
+        Script script = scriptService.getByScriptName(ScriptConstants.XSYNC);
+        Server server = serverService.getById(1);
+        Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+        String softwarePath = configService.getByKey(ConfigConstants.SOFTWARE_PATH);
+
+        List<Server> serverList = serverService.list(null);
+        String execCommand = buildSyncSoftwareCommand(server, serverList, script, softwarePath);
+
+        String execResult = CommandUtil.exec(session, execCommand);
+        log.info("同步组件结果", execResult);
+        return true;
+    }
+
+    private String buildSyncSoftwareCommand(Server server, List<Server> serverList, Script script, String softwarePath) {
+        StringBuilder sb = new StringBuilder(script.getScriptPath() + script.getScriptName() + " '");
+
+        for (Server serv : serverList) {
+            sb.append(serv.getServerName() + " ");
+        }
+        sb.append("' ");
+        sb.append(softwarePath);
+        return sb.toString();
+    }
+
     @Override
     public String viewFile(String absolutePath, Integer serverId) {
         Server server = serverService.getById(serverId);
@@ -83,6 +119,19 @@ public class Centos7InstallStrategy implements InstallStrategy{
         }
         Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
         return CommandUtil.exec(session, "cat " + absolutePath);
+    }
+
+    @Override
+    public boolean installJDK(List<Integer> serverIds) {
+        Collection<Server> servers = serverService.listByIds(serverIds);
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.JDK);
+        for (Server server : servers) {
+            Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+            CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareName() + " -C " + software.getInstallPath());
+            CommandUtil.exec(session, "echo '" + software.getEnvContent() + "' >> " + software.getEnvPath());
+            CommandUtil.exec(session, "source " + software.getEnvPath());
+        }
+        return true;
     }
 
     /**

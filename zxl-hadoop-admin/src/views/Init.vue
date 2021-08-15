@@ -54,32 +54,7 @@
         </el-row>
       </el-card>
 
-
-      <!-- 3. JDK配置 -->
-      <el-card class="order-item">
-        <template #header>
-          <div class="card-header"> <span>JDK配置</span> </div>
-        </template>
-
-
-        <el-row>
-          <el-popconfirm title="确定配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
-            <template #reference>
-              <el-button size="small" type="primary" icon="el-icon-star-off" plain>一键配置</el-button>
-            </template>
-          </el-popconfirm>
-
-
-          <el-popconfirm title="确定重新配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
-            <template #reference>
-              <el-button size="small" type="danger" icon="el-icon-star-off" plain>重新配置</el-button>
-            </template>
-          </el-popconfirm>
-
-        </el-row>
-      </el-card>
-
-      <!-- 4. 脚本同步配置 -->
+      <!-- 3. 脚本同步配置 -->
       <el-card class="order-item">
         <template #header>
           <div class="card-header"> <span>脚本同步配置</span> </div>
@@ -103,8 +78,35 @@
         </el-row>
       </el-card>
 
+      <!-- 4. 组件同步配置 -->
+      <el-card class="order-item">
+        <template #header>
+          <div class="card-header"> <span>组件同步配置</span> </div>
+        </template>
+
+
+        <el-row>
+          <el-popconfirm title="确定配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleSoftwareSync">
+            <template #reference>
+              <el-button size="small" type="primary" icon="el-icon-star-off" plain>一键同步</el-button>
+            </template>
+          </el-popconfirm>
+
+
+          <el-popconfirm title="确定重新配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleSoftwareSync">
+            <template #reference>
+              <el-button size="small" type="danger" icon="el-icon-star-off" plain>重新同步</el-button>
+            </template>
+          </el-popconfirm>
+
+        </el-row>
+      </el-card>
+
 
     </div>
+
+
+
 
     <div class="order">
 
@@ -248,9 +250,6 @@ export default {
           confirmButtonText: 'OK',
           customClass: 'msgbox-class'
         });
-
-
-        //ElMessage.success(res.data.data)
       })
 
     }
@@ -261,8 +260,16 @@ export default {
       }).then(() => {
         ElMessage.success('配置成功')
       })
-
     }
+
+    const handleSoftwareSync = () => {
+
+      axios.post(`/init/syncSoftware`, {
+      }).then(() => {
+        ElMessage.success('同步成功')
+      })
+    }
+
 
     const handleScriptConfig = () => {
       axios.post(`/init/syncScript`, {
@@ -286,7 +293,8 @@ export default {
       handleSSHConfig,
       handleScriptConfig,
       handleJDKConfig,
-      handleViewFile
+      handleViewFile,
+      handleSoftwareSync
     }
   }
 }

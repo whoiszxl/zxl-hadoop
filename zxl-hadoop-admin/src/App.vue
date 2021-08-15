@@ -16,11 +16,11 @@
         >
           <el-submenu index="1">
             <template #title>
-              <span>初始化管理</span>
+              <span>安装管理</span>
             </template>
             <el-menu-item-group>
               <el-menu-item index="/"><i class="el-icon-star-off" />首页</el-menu-item>
-              <el-menu-item index="/init"><i class="el-icon-star-off" />初始化</el-menu-item>
+              <el-menu-item index="/init"><i class="el-icon-star-off" />组件安装</el-menu-item>
               <el-menu-item index="/server"><i class="el-icon-star-off" />服务器管理</el-menu-item>
               <el-menu-item index="/software"><i class="el-icon-star-off" />组件管理</el-menu-item>
               <el-menu-item index="/script"><i class="el-icon-star-off" />脚本管理</el-menu-item>
