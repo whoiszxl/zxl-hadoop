@@ -110,25 +110,24 @@
 
     <div class="order">
 
-
-      <!-- hosts配置 -->
+      <!-- 1. JDK安装 -->
       <el-card class="order-item">
         <template #header>
-          <div class="card-header"> <span>hosts配置</span> </div>
+          <div class="card-header"> <span>JDK安装</span> </div>
         </template>
 
 
         <el-row>
-          <el-popconfirm title="确定配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleHostsConfig">
+          <el-popconfirm title="确定安装吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
             <template #reference>
-              <el-button size="small" type="primary" icon="el-icon-star-off" plain>一键配置</el-button>
+              <el-button size="small" type="primary" icon="el-icon-star-off" plain>一键安装</el-button>
             </template>
           </el-popconfirm>
 
 
-          <el-popconfirm title="确定重新配置吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleHostsConfig">
+          <el-popconfirm title="确定重新安装吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
             <template #reference>
-              <el-button size="small" type="danger" icon="el-icon-star-off" plain>重新配置</el-button>
+              <el-button size="small" type="danger" icon="el-icon-star-off" plain>重新安装</el-button>
             </template>
           </el-popconfirm>
 
@@ -280,10 +279,9 @@ export default {
     }
 
     const handleJDKConfig = () => {
-
-      axios.post(`/init/configHosts`, {
-      }).then(() => {
-        ElMessage.success('删除成功')
+      //TODO 暂时写死传入服务器id，要修改为动态传入
+      axios.post(`/install/jdk`, [1,2,3]).then(() => {
+        ElMessage.success('JDK安装成功')
       })
 
     }

@@ -127,8 +127,13 @@ public class Centos7InstallStrategy implements InstallStrategy{
         Software software = softwareService.getBySoftwareName(SoftwareConstants.JDK);
         for (Server server : servers) {
             Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
-            CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareName() + " -C " + software.getInstallPath());
+            //1. 创建安装目录
+            CommandUtil.exec(session, "mkdir -p " + software.getInstallPath());
+            //2. 解压到安装目录
+            CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+            //3. 输出环境变量
             CommandUtil.exec(session, "echo '" + software.getEnvContent() + "' >> " + software.getEnvPath());
+            //4. 刷新环境变量
             CommandUtil.exec(session, "source " + software.getEnvPath());
         }
         return true;

@@ -61,12 +61,10 @@ DROP TABLE IF EXISTS `zxl_script`;
 CREATE TABLE `zxl_script` (
     `id`                            int(10) NOT NULL AUTO_INCREMENT COMMENT '脚本文件主键ID',
     `script_name`                   varchar(300) NOT NULL COMMENT '脚本名称',
+    `script_path`                   varchar(300) NOT NULL COMMENT '脚本路径',
     `script_content`                text NOT NULL COMMENT '脚本内容',
-    `script_desc   `                varchar(300) NOT NULL COMMENT '脚本描述',
-    `config_path`                   varchar(300) NOT NULL COMMENT '配置文件路径',
-    `config_template`               text NOT NULL COMMENT '配置文件模板',
-    `config_template_params`        varchar(2000) NOT NULL COMMENT '配置文件模板参数，JSON格式保存，example: {"namenode_port":10000}',
-    `install_status`                tinyint(1) DEFAULT 1 COMMENT '安装状态：1 未安装 2 安装成功',
+    `script_desc`                   varchar(300) NOT NULL COMMENT '脚本描述',
+    `status`                        tinyint(1) DEFAULT 1 COMMENT '状态：1 未同步 2 已同步',
     `created_at`                    datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`                    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
