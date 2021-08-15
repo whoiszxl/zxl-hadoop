@@ -1,23 +1,32 @@
 package com.whoiszxl.strategy;
 
+import cn.hutool.core.lang.Dict;
+import cn.hutool.extra.template.Template;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
+import cn.hutool.json.JSONUtil;
+import com.google.gson.Gson;
 import com.jcraft.jsch.Session;
 import com.whoiszxl.constants.ConfigConstants;
 import com.whoiszxl.constants.ScriptConstants;
+import com.whoiszxl.constants.SoftwareConfigNameConstants;
 import com.whoiszxl.constants.SoftwareConstants;
 import com.whoiszxl.entity.Script;
 import com.whoiszxl.entity.Server;
 import com.whoiszxl.entity.Software;
-import com.whoiszxl.service.ConfigService;
-import com.whoiszxl.service.ScriptService;
-import com.whoiszxl.service.ServerService;
-import com.whoiszxl.service.SoftwareService;
+import com.whoiszxl.entity.SoftwareConfig;
+import com.whoiszxl.entity.template.ZookeeperTemplateParamsEntity;
+import com.whoiszxl.service.*;
 import com.whoiszxl.utils.CommandUtil;
+import com.whoiszxl.utils.MyTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -34,6 +43,9 @@ public class Centos7InstallStrategy implements InstallStrategy{
 
     @Autowired
     private SoftwareService softwareService;
+
+    @Autowired
+    private SoftwareConfigService softwareConfigService;
 
     @Override
     public boolean configHosts() {
@@ -137,6 +149,74 @@ public class Centos7InstallStrategy implements InstallStrategy{
             CommandUtil.exec(session, "source " + software.getEnvPath());
         }
         return true;
+    }
+
+
+    @Override
+    public boolean installZookeeper(List<Integer> serverIds) {
+        Collection<Server> servers = serverService.listByIds(serverIds);
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.ZOOKEEPER);
+
+        String clusterConfig = buildZkClusterConfig(servers);
+
+        int myid = 1;
+        for (Server server : servers) {
+            //获取需要安装zk的服务器列表并连接
+            Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+
+            //1. 创建安装目录
+            CommandUtil.exec(session, "mkdir -p " + software.getInstallPath());
+
+            //2. 解压到安装目录
+            CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+
+            //3. 输出环境变量
+            CommandUtil.exec(session, "echo '" + software.getEnvContent() + "' >> " + software.getEnvPath());
+
+            //4. 解析zoo.cfg配置
+            SoftwareConfig softwareConfig = softwareConfigService.getBySoftwareConfigName(SoftwareConfigNameConstants.ZOO_CFG);
+            //4.1 解析模板参数
+            ZookeeperTemplateParamsEntity templateParams = JSONUtil.toBean(softwareConfig.getConfigTemplateParams(), ZookeeperTemplateParamsEntity.class);
+            //4.2 通过模板参数配置
+            String zooCfg = MyTemplateUtil.convertTemplate(softwareConfig.getConfigTemplate(), softwareConfig.getConfigTemplateParams());
+            zooCfg = zooCfg + "\n" + clusterConfig;
+            //4.3 将模板参数写入
+            CommandUtil.exec(session, "echo '" + zooCfg + "' > " + software.getInstallPath() + "apache-zookeeper-3.5.7-bin/conf");
+
+            //5. 创建zk数据文件目录
+            CommandUtil.exec(session, "mkdir " + templateParams.getDataDir());
+
+            //4. 输出myid文件
+            CommandUtil.exec(session, "echo " + myid + " > " + templateParams.getDataDir() + "/myid");
+
+            myid++;
+        }
+
+
+        return false;
+    }
+
+    /**
+     * 构建zk集群配置
+     * @param servers
+     * @return
+     */
+    private String buildZkClusterConfig(Collection<Server> servers) {
+        int myid = 1;
+        StringBuilder sb = new StringBuilder("#cluster\n");
+        for (Server server : servers) {
+            sb.append("server.");
+            sb.append(myid);
+            sb.append("=");
+            sb.append(server.getServerName());
+            sb.append(":2888:3888");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public boolean installKafka(List<Integer> serverIds) {
+        return false;
     }
 
     /**

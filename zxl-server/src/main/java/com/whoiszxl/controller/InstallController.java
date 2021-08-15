@@ -42,4 +42,21 @@ public class InstallController {
         return ResponseResult.buildByFlag(installFlag);
     }
 
+    @SaCheckLogin
+    @PostMapping("/zookeeper")
+    @ApiOperation(value = "安装zookeeper", notes = "安装zookeeper", response = Object.class)
+    public ResponseResult<Object> installZookeeper(@RequestBody List<Integer> serverIds) {
+        boolean installFlag = installStrategy.installZookeeper(serverIds);
+        return ResponseResult.buildByFlag(installFlag);
+    }
+
+
+    @SaCheckLogin
+    @PostMapping("/kafka")
+    @ApiOperation(value = "安装kafka", notes = "安装kafka", response = Object.class)
+    public ResponseResult<Object> installKafka(@RequestBody List<Integer> serverIds) {
+        boolean installFlag = installStrategy.installKafka(serverIds);
+        return ResponseResult.buildByFlag(installFlag);
+    }
+
 }

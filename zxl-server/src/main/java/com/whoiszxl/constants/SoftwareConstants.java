@@ -6,4 +6,6 @@ public interface SoftwareConstants {
 
     String JDK = "jdk";
 
+    String ZOOKEEPER = "zookeeper";
+
 }

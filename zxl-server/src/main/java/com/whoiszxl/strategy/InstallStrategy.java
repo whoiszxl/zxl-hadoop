@@ -48,4 +48,18 @@ public interface InstallStrategy {
      * @return 是否安装成功
      */
     boolean installJDK(List<Integer> serverIds);
+
+    /**
+     * 安装zookeeper
+     * @param serverIds 服务器ID集合
+     * @return 是否安装成功
+     */
+    boolean installZookeeper(List<Integer> serverIds);
+
+    /**
+     * 安装kafka
+     * @param serverIds 服务器ID集合
+     * @return 是否安装成功
+     */
+    boolean installKafka(List<Integer> serverIds);
 }

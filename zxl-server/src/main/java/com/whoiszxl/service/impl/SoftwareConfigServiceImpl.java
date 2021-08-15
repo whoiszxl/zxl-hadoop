@@ -1,9 +1,10 @@
 package com.whoiszxl.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whoiszxl.entity.SoftwareConfig;
 import com.whoiszxl.mapper.SoftwareConfigMapper;
 import com.whoiszxl.service.SoftwareConfigService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,4 +18,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SoftwareConfigServiceImpl extends ServiceImpl<SoftwareConfigMapper, SoftwareConfig> implements SoftwareConfigService {
 
+
+    @Override
+    public SoftwareConfig getBySoftwareConfigName(String configName) {
+        LambdaQueryWrapper<SoftwareConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SoftwareConfig::getConfigName, configName);
+        return this.getOne(queryWrapper);
+    }
 }

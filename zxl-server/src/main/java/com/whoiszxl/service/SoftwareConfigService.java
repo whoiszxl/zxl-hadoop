@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SoftwareConfigService extends IService<SoftwareConfig> {
 
+    /**
+     * 通过组件配置文件名获取配置信息
+     * @param zooCfg
+     * @return
+     */
+    SoftwareConfig getBySoftwareConfigName(String zooCfg);
 }
