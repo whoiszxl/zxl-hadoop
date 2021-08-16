@@ -54,6 +54,9 @@ public class InstallController {
             case SoftwareConstants.KAFKA:
                 installFlag = installStrategy.installKafka(installQuery.getServerIds());
                 break;
+            case SoftwareConstants.HADOOP:
+                installFlag = installStrategy.installHadoop();
+                break;
             default:
                 break;
         }

@@ -144,13 +144,36 @@ public class Centos7InstallStrategy implements InstallStrategy{
             //2. 解压到安装目录
             CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
             //3. 输出环境变量
-            CommandUtil.exec(session, "echo '" + software.getEnvContent() + "' >> " + software.getEnvPath());
+            CommandUtil.exec(session, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' >> " + software.getEnvPath());
             //4. 刷新环境变量
             CommandUtil.exec(session, "source " + software.getEnvPath());
         }
         return true;
     }
 
+    @Override
+    public boolean installHadoop() {
+        //1. 获取第一台服务器来操作集群安装
+        Server server = serverService.getById(1);
+        Session session = CommandUtil.getSession(server);
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.HADOOP);
+
+        //2. 创建目录，解压，输出环境变量
+        CommandUtil.exec(session, "mkdir -p " + software.getInstallPath());
+        CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+        CommandUtil.exec(session, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' >> " + software.getEnvPath());
+
+        //3. 覆盖配置
+        List<SoftwareConfig> softwareConfigList = softwareConfigService.getlistBySoftwareName(SoftwareConstants.HADOOP);
+        for (SoftwareConfig softwareConfig : softwareConfigList) {
+            String config = MyTemplateUtil.convertTemplate(softwareConfig.getConfigTemplate(), softwareConfig.getConfigTemplateParams());
+            config = MyTemplateUtil.replaceGanR(config);
+            //将模板参数写入
+            CommandUtil.exec(session, "echo '" + config + "' > " + softwareConfig.getConfigPath() + softwareConfig.getConfigName());
+        }
+
+        return false;
+    }
 
     @Override
     public boolean installZookeeper(List<Integer> serverIds) {
@@ -192,7 +215,6 @@ public class Centos7InstallStrategy implements InstallStrategy{
 
             myid++;
         }
-
 
         return true;
     }

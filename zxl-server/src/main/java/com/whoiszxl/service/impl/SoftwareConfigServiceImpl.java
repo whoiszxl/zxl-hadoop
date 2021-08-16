@@ -7,6 +7,8 @@ import com.whoiszxl.mapper.SoftwareConfigMapper;
 import com.whoiszxl.service.SoftwareConfigService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 基础组件配置表 服务实现类
@@ -24,5 +26,12 @@ public class SoftwareConfigServiceImpl extends ServiceImpl<SoftwareConfigMapper,
         LambdaQueryWrapper<SoftwareConfig> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SoftwareConfig::getConfigName, configName);
         return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public List<SoftwareConfig> getlistBySoftwareName(String softwareName) {
+        LambdaQueryWrapper<SoftwareConfig> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SoftwareConfig::getSoftwareName, softwareName);
+        return this.list(queryWrapper);
     }
 }

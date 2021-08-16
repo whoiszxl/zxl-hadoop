@@ -62,4 +62,10 @@ public interface InstallStrategy {
      * @return 是否安装成功
      */
     boolean installKafka(List<Integer> serverIds);
+
+    /**
+     * 安装hadoop
+     * @return 是否安装成功
+     */
+    boolean installHadoop();
 }

@@ -3,6 +3,7 @@ package com.whoiszxl.utils;
 import cn.hutool.extra.ssh.JschUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.whoiszxl.entity.Server;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -39,4 +40,7 @@ public class CommandUtil {
         return null;
     }
 
+    public static Session getSession(Server server) {
+        return getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+    }
 }
