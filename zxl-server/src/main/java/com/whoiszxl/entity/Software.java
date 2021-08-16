@@ -50,8 +50,11 @@ public class Software implements Serializable {
     @ApiModelProperty(value = "环境变量内容")
     private String envContent;
 
-    @ApiModelProperty(value = "安装状态：1 未安装 2 安装成功")
+    @ApiModelProperty(value = "安装状态：1 未安装 2 部分安装 3 全安装")
     private Integer installStatus;
+
+    @ApiModelProperty(value = "安装了此组件的服务ID集合， 逗号分隔 : 1,2,3")
+    private String installServerIds;
 
     @ApiModelProperty(value = "创建时间")
     private Date createdAt;

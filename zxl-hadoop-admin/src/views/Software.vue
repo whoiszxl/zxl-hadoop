@@ -21,7 +21,7 @@
         <el-table-column prop="envPath" label="环境变量文件"/>
         <el-table-column width="100" label="是否安装">
           <template #default="scope">
-            {{ scope.row.installStatus == 1 ? '未安装' : '已安装' }}
+            {{ scope.row.installStatus == 1 ? '未安装' : (scope.row.installStatus == 2 ? '部分安装' : '已全部安装') }}
           </template>
         </el-table-column>
 
@@ -29,7 +29,7 @@
         <el-table-column width="500" label="操作">
           <template #default="scope">
             <span style="margin-left:2px;">
-            <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
+            <el-button @click="handleInstall(scope.row.softwareName)" :disabled="scope.row.installStatus === 3" type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
             <el-button @click="handleConfig(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">配置文件管理</el-button>
             <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
 
@@ -78,6 +78,19 @@ export default {
       router.push({ path: '/software/config', query: { id } })
     }
 
+
+    const handleInstall = (softwareName) => {
+
+      axios.post(`/install`, {
+        'softwareName': softwareName,
+        'serverIds': [1,2,3]
+      }).then(() => {
+        ElMessage.success(softwareName + '安装成功')
+        table.value.getList()
+      })
+
+    }
+
     const handleDelete = (id) => {
 
       axios.delete(`/software/` + id, {
@@ -94,7 +107,8 @@ export default {
       handleEdit,
       handleConfig,
       handleDelete,
-      table
+      table,
+      handleInstall
 
     }
   }

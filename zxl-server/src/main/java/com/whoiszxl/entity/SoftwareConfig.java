@@ -32,9 +32,6 @@ public class SoftwareConfig implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "组件ID")
-    private Integer softwareId;
-
     @ApiModelProperty(value = "组件文件名")
     private String softwareName;
 

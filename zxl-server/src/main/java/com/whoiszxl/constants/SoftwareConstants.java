@@ -8,4 +8,6 @@ public interface SoftwareConstants {
 
     String ZOOKEEPER = "zookeeper";
 
+    String KAFKA = "kafka";
+
 }

@@ -35,7 +35,8 @@ CREATE TABLE `zxl_software` (
     `install_path`                  varchar(300) NOT NULL COMMENT '组件安装路径',
     `env_path`                      varchar(300) NOT NULL COMMENT '环境变量路径',
     `env_content`                   varchar(1000) NOT NULL COMMENT '环境变量内容',
-    `install_status`                tinyint(1) DEFAULT 1 COMMENT '安装状态：1 未安装 2 安装成功',
+    `install_status`                tinyint(1) DEFAULT 1 COMMENT '安装状态：1 未安装 2 部分安装 3 全安装',
+    `install_server_ids`            varchar(300) COMMENT '安装了此组件的服务ID集合， 逗号分隔 : 1,2,3',
     `created_at`                    datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`                    datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
@@ -44,7 +45,6 @@ CREATE TABLE `zxl_software` (
 DROP TABLE IF EXISTS `zxl_software_config`;
 CREATE TABLE `zxl_software_config` (
     `id`                            int(10) NOT NULL AUTO_INCREMENT COMMENT '组件配置文件主键ID',
-    `software_id`                   int(10) NOT NULL COMMENT '组件ID',
     `software_name`                 varchar(300) NOT NULL COMMENT '组件文件名',
     `config_name`                   varchar(300) NOT NULL COMMENT '配置文件名',
     `config_path`                   varchar(300) NOT NULL COMMENT '配置文件路径',

@@ -46,8 +46,8 @@ public class SoftwareConfigController {
             wrapper.like(SoftwareConfig::getSoftwareName, "%" + query.getSoftwareName() + "%");
         }
 
-        if(query.getSoftwareId() != null) {
-            wrapper.eq(SoftwareConfig::getSoftwareId, query.getSoftwareId());
+        if(query.getSoftwareName() != null) {
+            wrapper.eq(SoftwareConfig::getSoftwareName, query.getSoftwareName());
         }
 
         IPage<SoftwareConfig> pageResult = softwareConfigService.page(new Page<>(query.getPage(), query.getSize()), wrapper);
@@ -67,7 +67,7 @@ public class SoftwareConfigController {
     @ApiOperation(value = "新增组件配置", notes = "新增组件配置", response = ResponseResult.class)
     public ResponseResult<Boolean> save(@RequestBody SoftwareConfig softwareConfig) {
         //校验组件是否存在
-        Software software = softwareService.getById(softwareConfig.getSoftwareId());
+        Software software = softwareService.getBySoftwareName(softwareConfig.getSoftwareName());
         if(software == null) {
             return ResponseResult.buildError("组件不存在");
         }
@@ -81,7 +81,7 @@ public class SoftwareConfigController {
     @ApiOperation(value = "更新组件配置", notes = "更新组件配置", response = ResponseResult.class)
     public ResponseResult<Boolean> update(@RequestBody SoftwareConfig softwareConfig) {
         //校验组件是否存在
-        Software software = softwareService.getById(softwareConfig.getSoftwareId());
+        Software software = softwareService.getBySoftwareName(softwareConfig.getSoftwareName());
         if(software == null) {
             return ResponseResult.buildError("组件不存在");
         }

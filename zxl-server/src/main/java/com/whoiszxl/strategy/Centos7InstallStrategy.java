@@ -171,7 +171,7 @@ public class Centos7InstallStrategy implements InstallStrategy{
             CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
 
             //3. 输出环境变量
-            CommandUtil.exec(session, "echo '" + software.getEnvContent() + "' >> " + software.getEnvPath());
+            CommandUtil.exec(session, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' >> " + software.getEnvPath());
 
             //4. 解析zoo.cfg配置
             SoftwareConfig softwareConfig = softwareConfigService.getBySoftwareConfigName(SoftwareConfigNameConstants.ZOO_CFG);
@@ -180,8 +180,9 @@ public class Centos7InstallStrategy implements InstallStrategy{
             //4.2 通过模板参数配置
             String zooCfg = MyTemplateUtil.convertTemplate(softwareConfig.getConfigTemplate(), softwareConfig.getConfigTemplateParams());
             zooCfg = zooCfg + "\n" + clusterConfig;
+            zooCfg = MyTemplateUtil.replaceGanR(zooCfg);
             //4.3 将模板参数写入
-            CommandUtil.exec(session, "echo '" + zooCfg + "' > " + software.getInstallPath() + "apache-zookeeper-3.5.7-bin/conf");
+            CommandUtil.exec(session, "echo '" + zooCfg + "' > " + softwareConfig.getConfigPath() + softwareConfig.getConfigName());
 
             //5. 创建zk数据文件目录
             CommandUtil.exec(session, "mkdir " + templateParams.getDataDir());
@@ -193,7 +194,7 @@ public class Centos7InstallStrategy implements InstallStrategy{
         }
 
 
-        return false;
+        return true;
     }
 
     /**
@@ -209,13 +210,34 @@ public class Centos7InstallStrategy implements InstallStrategy{
             sb.append(myid);
             sb.append("=");
             sb.append(server.getServerName());
-            sb.append(":2888:3888");
+            sb.append(":2888:3888\n");
+            myid++;
         }
         return sb.toString();
     }
 
     @Override
     public boolean installKafka(List<Integer> serverIds) {
+        Collection<Server> servers = serverService.listByIds(serverIds);
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.KAFKA);
+
+        int brokerId = 1;
+        for (Server server : servers) {
+            //获取需要安装zk的服务器列表并连接
+            Session session = CommandUtil.getSession(server.getServerOuterIp(), Integer.parseInt(server.getServerPort()), server.getServerUsername(), server.getServerPassword());
+
+            CommandUtil.exec(session, "mkdir -p " + software.getInstallPath());
+            CommandUtil.exec(session, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+            CommandUtil.exec(session, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' >> " + software.getEnvPath());
+
+            SoftwareConfig softwareConfig = softwareConfigService.getBySoftwareConfigName(SoftwareConfigNameConstants.KAFKA_SERVER_PROPERTIES);
+            String kafkaConfig = MyTemplateUtil.convertTemplate(softwareConfig.getConfigTemplate(), softwareConfig.getConfigTemplateParams());
+            kafkaConfig = kafkaConfig + "\nbroker.id=" + brokerId;
+            kafkaConfig = MyTemplateUtil.replaceGanR(kafkaConfig);
+            CommandUtil.exec(session, "echo '" + kafkaConfig + "' > " + softwareConfig.getConfigPath() + softwareConfig.getConfigName());
+            brokerId++;
+        }
+
         return false;
     }
 

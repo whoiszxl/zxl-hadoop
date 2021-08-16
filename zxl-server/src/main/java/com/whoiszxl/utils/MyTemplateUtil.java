@@ -1,6 +1,5 @@
 package com.whoiszxl.utils;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
@@ -17,5 +16,9 @@ public class MyTemplateUtil {
         Template template = engine.getTemplate(templateStr);
         String result = template.render(new Gson().fromJson(params, Map.class));
         return result;
+    }
+
+    public static String replaceGanR(String str) {
+        return str.replace("\r", "");
     }
 }

@@ -26,6 +26,7 @@ export const pathMap = {
     software: '组件管理',
     softwareAdd: '组件新增',
     softwareConfig: '组件配置管理',
+    softwareConfigAdd: '组件配置新增',
     softwareConfigDetail: '组件配置详情',
     server: '服务器管理',
     serverAdd: '服务器新增',

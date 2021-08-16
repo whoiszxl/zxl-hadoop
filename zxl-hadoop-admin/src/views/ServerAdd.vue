@@ -93,7 +93,6 @@ export default {
           console.log('params', params)
           if (id) {
             params.id = id
-            // 修改商品使用 put 方法
             httpOption = axios.put
           }
           httpOption('/server', params).then(() => {

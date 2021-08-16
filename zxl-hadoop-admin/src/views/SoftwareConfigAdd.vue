@@ -1,17 +1,28 @@
 <template>
-  <el-card class="softwareConfig-container">
-  <template #header>
-    <div class="header">
-      <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-search">返回上一页</el-button>
-    </div>
-  </template>
+  <el-card class="server-container">
+    <template #header>
+      <div class="header">
+        <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-search">返回上一页</el-button>
+      </div>
+    </template>
 
   <div class="add">
     <el-card class="add-container">
       <el-form :model="softwareConfigForm" :rules="rules" ref="softwareConfigRef" label-width="100px" class="softwareConfigForm">
         <el-form-item label="组件名称">
           <el-input style="width: 300px" v-model="softwareConfigForm.softwareName"/>
+          <el-select v-model="softwareConfigForm.softwareName" placeholder="请选择">
+            <el-option
+                v-for="item in softwareList"
+                :key="item.softwareName"
+                :label="item.softwareName"
+                :value="item.softwareName"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
+
+
         <el-form-item label="配置名称">
           <el-input style="width: 300px" v-model="softwareConfigForm.configName"/>
         </el-form-item>
@@ -24,6 +35,10 @@
         <el-form-item label="配置模板参数">
           <el-input style="width: 600px" type="textarea" autosize v-model="softwareConfigForm.configTemplateParams"/>
         </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitAdd()">{{ id ? '立即修改' : '立即创建' }}</el-button>
+        </el-form-item>
       </el-form>
     </el-card>
   </div>
@@ -31,12 +46,12 @@
 </template>
 
 <script>
-import {getCurrentInstance, onBeforeUnmount, onMounted, reactive, ref, toRefs} from 'vue'
+import { reactive, ref, toRefs, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue'
 import axios from '@/utils/axios'
-import {useRoute, useRouter} from 'vue-router'
-
+import { ElMessage } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
 export default {
-  name: 'SoftwareConfigDetail',
+  name: 'SoftwareConfigAdd',
   setup() {
     const { proxy } = getCurrentInstance()
     console.log('proxy', proxy)
@@ -56,7 +71,13 @@ export default {
         configTemplateParams: ''
       },
 
-      tableData: [],
+      softwareList: [],
+
+      rules: {
+        softwareName: [
+          { required: 'true', message: '请填写组件名称', trigger: ['change'] }
+        ]
+      },
     })
 
     const back = () => {
@@ -64,6 +85,15 @@ export default {
     }
 
     onMounted(() => {
+      axios.get(`/software`, {
+        params: {
+          page: 1,
+          size: 100000
+        }
+      }).then(res => {
+        state.softwareList = res.data.data.records;
+      })
+
       if (id) {
         axios.get(`/software-config/${id}`).then(res => {
           state.softwareConfigForm = {
@@ -79,10 +109,36 @@ export default {
     })
     onBeforeUnmount(() => {
     })
+    const submitAdd = () => {
+      softwareConfigRef.value.validate((vaild) => {
+        if (vaild) {
+          // 默认新增用 post 方法
+          let httpOption = axios.post
+          let params = {
+            softwareId: state.softwareConfigForm.softwareId,
+            softwareName: state.softwareConfigForm.softwareName,
+            configName: state.softwareConfigForm.configName,
+            configPath: state.softwareConfigForm.configPath,
+            configTemplate: state.softwareConfigForm.configTemplate,
+            configTemplateParams: state.softwareConfigForm.configTemplateParams
+          }
+          console.log('params', params)
+          if (id) {
+            params.id = id
+            httpOption = axios.put
+          }
+          httpOption('/software-config', params).then(() => {
+            ElMessage.success(id ? '修改成功' : '添加成功')
+            router.push({ path: '/software/config' })
+          })
+        }
+      })
+    }
 
     return {
       ...toRefs(state),
-      softwareConfigRef: softwareConfigRef,
+      softwareConfigRef,
+      submitAdd,
       back
     }
   }

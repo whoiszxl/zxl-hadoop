@@ -20,8 +20,8 @@
           width="300"
       >
         <template #default="scope">
-          <el-button @click="handleDetail(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">详情</el-button>
-          <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
+          <el-button @click="handleDetail(scope.row.id, scope.row.softwareId)" type="primary" size="small" icon="el-icon-star-on">详情</el-button>
+          <el-button @click="handleEdit(scope.row.id, scope.row.softwareId)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
           <el-popconfirm title="确定删除吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleDelete(scope.row.id)">
             <template #reference>
               <el-button size="small" type="primary" icon="el-icon-delete">删除</el-button>
@@ -86,8 +86,8 @@ export default {
       router.push({ path: '/softwareConfig/add' })
     }
 
-    const handleDetail = (id) => {
-      router.push({ path: '/softwareConfig/detail', query: { id } })
+    const handleDetail = (id, mySoftwareId) => {
+      router.push({ path: '/softwareConfig/detail', query: { 'id':id, 'softwareId': mySoftwareId } })
     }
 
 
@@ -101,8 +101,8 @@ export default {
 
     }
 
-    const handleEdit = (id) => {
-      router.push({ path: '/softwareConfig/add', query: { id } })
+    const handleEdit = (id, mySoftwareId) => {
+      router.push({ path: '/softwareConfig/add', query: { 'id':id, 'softwareId': mySoftwareId } })
     }
     const changePage = (val) => {
       state.currentPage = val

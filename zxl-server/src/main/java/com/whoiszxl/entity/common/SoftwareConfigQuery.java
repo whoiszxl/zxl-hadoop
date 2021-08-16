@@ -16,9 +16,6 @@ import lombok.EqualsAndHashCode;
 @ApiModel(value="组件配置查询参数", description="组件配置查询参数")
 public class SoftwareConfigQuery extends PageQuery {
 
-    @ApiModelProperty(value = "组件ID")
-    private Integer softwareId;
-
     @ApiModelProperty(value = "组件名称")
     private String softwareName;
 }

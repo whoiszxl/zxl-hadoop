@@ -11,6 +11,7 @@ import SoftwareConfigDetail from "@/views/SoftwareConfigDetail.vue";
 import Script from "@/views/Script.vue";
 import ScriptAdd from "@/views/ScriptAdd.vue";
 import Init from "@/views/Init.vue";
+import SoftwareConfigAdd from "@/views/SoftwareConfigAdd.vue";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -54,6 +55,12 @@ const router = createRouter({
             path: '/softwareConfig/detail',
             name: 'softwareConfigDetail',
             component: SoftwareConfigDetail
+        },
+
+        {
+            path: '/softwareConfig/add',
+            name: 'softwareConfigAdd',
+            component: SoftwareConfigAdd
         },
 
         {
