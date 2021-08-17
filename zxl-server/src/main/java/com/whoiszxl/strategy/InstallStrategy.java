@@ -71,8 +71,16 @@ public interface InstallStrategy {
 
     /**
      * flume安装
-     * @param serverIds
-     * @return
+     * @param serverIds 服务器ID集合
+     * @return 是否安装成功
      */
     boolean installFlume(List<Integer> serverIds);
+
+    /**
+     * Spark安装
+     * @param serverIds 服务器ID集合
+     * @return 是否安装成功
+     */
+    boolean installSpark(List<Integer> serverIds);
+
 }

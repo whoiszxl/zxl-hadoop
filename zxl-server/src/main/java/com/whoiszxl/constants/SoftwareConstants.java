@@ -29,4 +29,6 @@ public interface SoftwareConstants {
     String CLICKHOUSE = "clickhouse";
 
     String IMPALA = "impala";
+
+    String SPARK = "spark";
 }

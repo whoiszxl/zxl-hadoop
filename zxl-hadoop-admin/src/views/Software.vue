@@ -29,9 +29,9 @@
         <el-table-column width="500" label="操作">
           <template #default="scope">
             <span style="margin-left:2px;">
-            <el-popconfirm title="确定安装吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
+            <el-popconfirm title="确定安装吗？" :disabled="scope.row.installStatus === 3" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleInstall(scope.row.softwareName)">
               <template #reference>
-                 <el-button @click="handleInstall(scope.row.softwareName)"
+                 <el-button
                             :disabled="scope.row.installStatus === 3"
                             type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
               </template>

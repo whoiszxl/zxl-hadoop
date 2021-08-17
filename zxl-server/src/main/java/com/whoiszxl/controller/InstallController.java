@@ -60,6 +60,8 @@ public class InstallController {
             case SoftwareConstants.FLUME:
                 installFlag = installStrategy.installFlume(installQuery.getServerIds());
                 break;
+            case SoftwareConstants.SPARK:
+                installFlag = installStrategy.installSpark(installQuery.getServerIds());
             default:
                 break;
         }

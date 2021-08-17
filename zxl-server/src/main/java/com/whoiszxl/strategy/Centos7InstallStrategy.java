@@ -250,6 +250,27 @@ public class Centos7InstallStrategy implements InstallStrategy{
         return true;
     }
 
+
+    @Override
+    public boolean installSpark(List<Integer> serverIds) {
+        Server controlServer = serverService.getById(1);
+        Session controlSession = CommandUtil.getSession(controlServer);
+        List<Server> installServers = (List<Server>) serverService.listByIds(serverIds);
+
+        // 1. 获取组件配置和同步脚本
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.SPARK);
+        Script syncScript = scriptService.getByScriptName(ScriptConstants.XSYNC);
+
+        //2. 创建目录，解压，输出环境变量
+        CommandUtil.exec(controlSession, "mkdir -p " + software.getInstallPath());
+        CommandUtil.exec(controlSession, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+        CommandUtil.exec(controlSession, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' > " + software.getEnvPath());
+
+        //3. 分发
+        CommandUtil.exec(controlSession, buildSyncSoftwareCommand(installServers, syncScript, software.getInstallPath() + "spark-3.0.0-bin-hadoop3.2"));
+        return true;
+    }
+
     /**
      * 构建zk集群配置
      * @param servers
