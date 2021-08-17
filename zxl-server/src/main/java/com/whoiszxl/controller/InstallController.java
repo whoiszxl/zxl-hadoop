@@ -57,6 +57,9 @@ public class InstallController {
             case SoftwareConstants.HADOOP:
                 installFlag = installStrategy.installHadoop();
                 break;
+            case SoftwareConstants.FLUME:
+                installFlag = installStrategy.installFlume(installQuery.getServerIds());
+                break;
             default:
                 break;
         }

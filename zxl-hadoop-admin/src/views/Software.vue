@@ -29,8 +29,16 @@
         <el-table-column width="500" label="操作">
           <template #default="scope">
             <span style="margin-left:2px;">
-            <el-button @click="handleInstall(scope.row.softwareName)" :disabled="scope.row.installStatus === 3" type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
-            <el-button @click="handleConfig(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">配置文件管理</el-button>
+            <el-popconfirm title="确定安装吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleJDKConfig">
+              <template #reference>
+                 <el-button @click="handleInstall(scope.row.softwareName)"
+                            :disabled="scope.row.installStatus === 3"
+                            type="primary" size="small" icon="el-icon-star-off">一键安装</el-button>
+              </template>
+            </el-popconfirm>
+
+
+            <el-button @click="handleConfig(scope.row.softwareName)" type="primary" size="small" icon="el-icon-star-on">配置文件管理</el-button>
             <el-button @click="handleEdit(scope.row.id)" type="primary" size="small" icon="el-icon-star-on">编辑</el-button>
 
             <el-popconfirm title="确定删除吗？" confirmButtonText='确定' cancelButtonText='取消' @confirm="handleDelete(scope.row.id)">
@@ -74,8 +82,8 @@ export default {
       router.push({ path: '/software/add', query: { id } })
     }
 
-    const handleConfig = (id) => {
-      router.push({ path: '/software/config', query: { id } })
+    const handleConfig = (softwareName) => {
+      router.push({ path: '/software/config', query: { softwareName } })
     }
 
 

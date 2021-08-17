@@ -68,4 +68,11 @@ public interface InstallStrategy {
      * @return 是否安装成功
      */
     boolean installHadoop();
+
+    /**
+     * flume安装
+     * @param serverIds
+     * @return
+     */
+    boolean installFlume(List<Integer> serverIds);
 }

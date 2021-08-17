@@ -1,4 +1,11 @@
 <template>
+  <el-card class="server-container">
+  <template #header>
+    <div class="header">
+      <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-arrow-left">返回上一页</el-button>
+    </div>
+  </template>
+
   <div class="add">
     <el-card class="add-container">
       <el-form :model="softwareForm" :rules="rules" ref="softwareRef" label-width="100px" class="softwareForm">
@@ -18,14 +25,15 @@
         <el-form-item label="修改安装状态" prop="installStatus">
           <el-radio-group v-model="softwareForm.installStatus">
             <el-radio :label="1">未安装</el-radio>
-            <el-radio :label="2">已安装</el-radio>
+            <el-radio :label="2">部分安装</el-radio>
+            <el-radio :label="3">全安装</el-radio>
           </el-radio-group>
         </el-form-item>
 
         <el-form-item label="环境变量路径" prop="envPath">
         </el-form-item>
         <el-form-item label="环境变量内容" prop="envContent">
-          <el-input style="width: 600px" type="textarea" v-model="softwareForm.envContent" placeholder="请输入环境变量内容"></el-input>
+          <el-input style="width: 600px" autosize type="textarea" v-model="softwareForm.envContent" placeholder="请输入环境变量内容"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -34,6 +42,7 @@
       </el-form>
     </el-card>
   </div>
+  </el-card>
 </template>
 
 <script>
@@ -111,15 +120,16 @@ export default {
         }
       })
     }
-    const handleUrlSuccess = (val) => {
-      state.softwareForm.goodsCoverImg = val.data || ''
+
+    const back = () => {
+      router.go(-1);
     }
 
     return {
       ...toRefs(state),
       softwareRef,
       submitAdd,
-      handleUrlSuccess
+      back
     }
   }
 }

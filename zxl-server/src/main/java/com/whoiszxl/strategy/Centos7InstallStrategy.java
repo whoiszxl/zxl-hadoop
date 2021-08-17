@@ -1,12 +1,6 @@
 package com.whoiszxl.strategy;
 
-import cn.hutool.core.lang.Dict;
-import cn.hutool.extra.template.Template;
-import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
 import cn.hutool.json.JSONUtil;
-import com.google.gson.Gson;
 import com.jcraft.jsch.Session;
 import com.whoiszxl.constants.ConfigConstants;
 import com.whoiszxl.constants.ScriptConstants;
@@ -26,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -105,14 +98,14 @@ public class Centos7InstallStrategy implements InstallStrategy{
         String softwarePath = configService.getByKey(ConfigConstants.SOFTWARE_PATH);
 
         List<Server> serverList = serverService.list(null);
-        String execCommand = buildSyncSoftwareCommand(server, serverList, script, softwarePath);
+        String execCommand = buildSyncSoftwareCommand(serverList, script, softwarePath);
 
         String execResult = CommandUtil.exec(session, execCommand);
         log.info("同步组件结果", execResult);
         return true;
     }
 
-    private String buildSyncSoftwareCommand(Server server, List<Server> serverList, Script script, String softwarePath) {
+    private String buildSyncSoftwareCommand(List<Server> serverList, Script script, String softwarePath) {
         StringBuilder sb = new StringBuilder(script.getScriptPath() + script.getScriptName() + " '");
 
         for (Server serv : serverList) {
@@ -156,7 +149,10 @@ public class Centos7InstallStrategy implements InstallStrategy{
         //1. 获取第一台服务器来操作集群安装
         Server server = serverService.getById(1);
         Session session = CommandUtil.getSession(server);
+
+        // 获取组件配置和同步脚本
         Software software = softwareService.getBySoftwareName(SoftwareConstants.HADOOP);
+        Script syncScript = scriptService.getByScriptName(ScriptConstants.XSYNC);
 
         //2. 创建目录，解压，输出环境变量
         CommandUtil.exec(session, "mkdir -p " + software.getInstallPath());
@@ -172,7 +168,13 @@ public class Centos7InstallStrategy implements InstallStrategy{
             CommandUtil.exec(session, "echo '" + config + "' > " + softwareConfig.getConfigPath() + softwareConfig.getConfigName());
         }
 
-        return false;
+        //4. 同步到其他机器上
+        List<Server> serverList = serverService.list(null);
+        String syncHadoopCommand = buildSyncSoftwareCommand(serverList, syncScript, software.getInstallPath() + "hadoop-3.1.3");
+        CommandUtil.exec(session, syncHadoopCommand);
+        CommandUtil.exec(session, buildSyncSoftwareCommand(serverList, syncScript, software.getEnvPath()));
+
+        return true;
     }
 
     @Override
@@ -216,6 +218,35 @@ public class Centos7InstallStrategy implements InstallStrategy{
             myid++;
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean installFlume(List<Integer> serverIds) {
+        Server controlServer = serverService.getById(1);
+        Session controlSession = CommandUtil.getSession(controlServer);
+        List<Server> installServers = (List<Server>) serverService.listByIds(serverIds);
+
+        // 获取组件配置和同步脚本
+        Software software = softwareService.getBySoftwareName(SoftwareConstants.FLUME);
+        Script syncScript = scriptService.getByScriptName(ScriptConstants.XSYNC);
+
+        //2. 创建目录，解压，输出环境变量
+        CommandUtil.exec(controlSession, "mkdir -p " + software.getInstallPath());
+        CommandUtil.exec(controlSession, "tar -zxvf " + software.getSoftwarePath() + software.getSoftwareFilename() + " -C " + software.getInstallPath());
+        CommandUtil.exec(controlSession, "echo '" + MyTemplateUtil.replaceGanR(software.getEnvContent()) + "' >> " + software.getEnvPath());
+
+        //3. 删除guava-11.0.2.jar文件
+        CommandUtil.exec(controlSession, "rm -rf " + software.getInstallPath() + "apache-flume-1.9.0-bin/lib/guava-11.0.2.jar");
+
+        //4. 输出配置文件
+        SoftwareConfig softwareConfig = softwareConfigService.getBySoftwareConfigName(SoftwareConfigNameConstants.FLUME_ENV_SH);
+        String flumeConfig = MyTemplateUtil.convertTemplate(softwareConfig.getConfigTemplate(), softwareConfig.getConfigTemplateParams());
+        flumeConfig = MyTemplateUtil.replaceGanR(flumeConfig);
+        CommandUtil.exec(controlSession, "echo '" + flumeConfig + "' > " + softwareConfig.getConfigPath() + softwareConfig.getConfigName());
+
+        //5. 分发
+        CommandUtil.exec(controlSession, buildSyncSoftwareCommand(installServers, syncScript, software.getInstallPath() + "apache-flume-1.9.0-bin"));
         return true;
     }
 

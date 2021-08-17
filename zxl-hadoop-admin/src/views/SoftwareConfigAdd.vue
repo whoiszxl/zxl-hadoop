@@ -2,7 +2,7 @@
   <el-card class="server-container">
     <template #header>
       <div class="header">
-        <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-search">返回上一页</el-button>
+        <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-arrow-left">返回上一页</el-button>
       </div>
     </template>
 

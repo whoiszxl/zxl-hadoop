@@ -2,6 +2,7 @@
   <el-card class="software-config-container">
     <template #header>
       <div class="header">
+        <el-button @click="back" style="margin-left:3px;" type="danger" size="mini" icon="el-icon-arrow-left">返回上一页</el-button>
         <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAdd">新增组件配置</el-button>
       </div>
     </template>
@@ -53,8 +54,8 @@ export default {
     const app = getCurrentInstance()
     const route = useRoute()
     const router = useRouter()
-    const softwareId = route.query
-    console.log(softwareId.id)
+    const query = route.query
+    console.log(query.softwareName)
     const state = reactive({
       loading: false,
       tableData: [], // 数据列表
@@ -72,7 +73,7 @@ export default {
         params: {
           page: state.page,
           size: state.size,
-          softwareId: softwareId.id
+          softwareName: query.softwareName
         }
       }).then(res => {
         state.tableData = res.data.data.records
@@ -98,7 +99,10 @@ export default {
         ElMessage.success('删除成功')
         getSoftwareConfigList()
       })
+    }
 
+    const back = () => {
+      router.go(-1);
     }
 
     const handleEdit = (id, mySoftwareId) => {
@@ -116,7 +120,8 @@ export default {
       handleEdit,
       handleDetail,
       changePage,
-      handleDelete
+      handleDelete,
+      back
     }
   }
 }
